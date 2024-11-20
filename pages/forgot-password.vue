@@ -10,7 +10,7 @@
             <!-- Message -->
             <AlertMessage
                 v-if="showAlert"
-                :variant="success"
+                :variant="alertVariant"
                 :message="alertMessage"
                 @close="showAlert = false"
             />
@@ -48,6 +48,7 @@
 <script setup>
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
+import { userService } from '~/services/userService'
 
 useHead({
     title: 'Forgot Password',
@@ -73,10 +74,27 @@ const { handleSubmit, defineField, errors } = useForm({
 const [email, emailProps] = defineField('email')
 
 const onSubmit = handleSubmit(async (values) => {
-    console.log(values)
     showAlert.value = false
-    alertVariant.value = 'success'
-    alertMessage.value = 'We sent Temporary password via your email address'
-    showAlert.value = true
+
+    try {
+        const response = await userService.forgotPassword({
+            email: values.email,
+        })
+
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = response.errors[0]
+            showAlert.value = true
+            return
+        }
+
+        alertVariant.value = 'success'
+        alertMessage.value = response.message
+        showAlert.value = true
+    } catch (error) {
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        showAlert.value = true
+    }
 })
 </script>

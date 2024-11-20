@@ -159,7 +159,6 @@
                                         class="w-[100px] mt-4"
                                     />
                                 </td>
-                                <td />
                             </tr>
                         </tbody>
                     </table>
@@ -176,6 +175,13 @@
                 <h3 class="text-lg font-bold mb-4">Change Password</h3>
 
                 <form @submit.prevent="submitChangePassword">
+                    <AlertMessage
+                        v-if="showAlertError"
+                        variant="error"
+                        :message="alertMessage"
+                        @close="showAlertError = false"
+                    />
+
                     <div class="mb-4">
                         <label class="block text-sm font-medium mb-1"
                             >New Password</label
@@ -229,6 +235,7 @@
 import { useForm } from 'vee-validate'
 import { ref } from 'vue'
 import * as yup from 'yup'
+import { userService } from '~/services/userService'
 
 definePageMeta({
     middleware: 'auth',
@@ -244,6 +251,7 @@ const activeTab = ref('profile') // Default tab is 'profile'
 const showAlert = ref(false)
 const alertVariant = ref('success')
 const alertMessage = ref('')
+const showAlertError = ref(false)
 
 // Define validation schema
 const validationSchema = yup.object({
@@ -268,15 +276,27 @@ const [confirmPassword, confirmPasswordProps] = defineField('confirmPassword')
 
 // Function to handle password change
 const submitChangePassword = handleSubmit(async (values) => {
-    // This code will only run if validation is successful
+    showAlert.value = false
+
     try {
-        console.log('Password successfully changed:', values)
-        showAlert.value = true
+        const response = await userService.changePassword({
+            newPassword: values.password,
+            confirmPassword: values.confirmPassword,
+        })
+
+        if (!response.success) {
+            alertMessage.value = response.errors[0]
+            showAlertError.value = true
+            return
+        }
+
         alertVariant.value = 'success'
-        alertMessage.value = 'Your password changed successfully!'
+        alertMessage.value = response.message
+        showAlert.value = true
         closeModal()
     } catch (error) {
-        console.error('Error changing password:', error)
+        alertMessage.value = error.errors[0]
+        showAlertError.value = true
     }
 })
 
@@ -285,7 +305,6 @@ const isModalOpen = ref(false)
 
 // Function to open the modal
 const openModal = () => {
-    // Reset the form values and clear validation errors when the modal is opened
     resetForm()
     isModalOpen.value = true
 }
@@ -293,7 +312,6 @@ const openModal = () => {
 // Function to close the modal
 const closeModal = () => {
     isModalOpen.value = false
-    password.value = ''
-    confirmPassword.value = ''
+    resetForm()
 }
 </script>
