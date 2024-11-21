@@ -50,25 +50,31 @@
                         <tbody>
                             <tr>
                                 <td class="py-2 pr-4 w-40">Username:</td>
-                                <td class="py-2">Mohammed Didar</td>
+                                <td class="py-2">
+                                    {{ authStore.user.username }}
+                                </td>
                             </tr>
                             <tr>
                                 <td class="py-2 pr-4 w-40">Email:</td>
-                                <td class="py-2">Mohammed.bu@gmail.com</td>
+                                <td class="py-2">{{ authStore.user.email }}</td>
                             </tr>
                             <tr>
                                 <td class="py-2 pr-4 w-40">Member Of Group:</td>
-                                <td class="py-2">Users</td>
+                                <td class="py-2">
+                                    {{ authStore.user.roles[0] }}
+                                </td>
                             </tr>
                             <tr>
                                 <td class="py-2 pr-4 w-40">Number Of Edits:</td>
-                                <td class="py-2">20</td>
+                                <td class="py-2">0</td>
                             </tr>
                             <tr>
                                 <td class="py-2 pr-4 w-40">
                                     Registration Time:
                                 </td>
-                                <td class="py-2">06:07, 4 October 2024</td>
+                                <td class="py-2">
+                                    {{ authStore.user.createdAt }}
+                                </td>
                             </tr>
                             <tr>
                                 <td class="py-2 pr-4 w-40">Password:</td>
@@ -244,6 +250,8 @@ definePageMeta({
 useHead({
     title: 'Preferences',
 })
+
+const authStore = useAuthStore()
 
 // Active tab state
 const activeTab = ref('profile') // Default tab is 'profile'
