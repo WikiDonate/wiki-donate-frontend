@@ -13,7 +13,7 @@ const changePassword = (params) => {
 }
 
 const updateNotifications = (params) => {
-    return api.put('/user/notifications', params)
+    return api.post('/user/notifications', params)
 }
 
 const getNotifications = () => {

@@ -109,10 +109,7 @@
                                     Edit to my talk page
                                 </td>
                                 <td class="py-2">
-                                    <Checkbox
-                                        v-model="editTalkPage"
-                                        checkbox-id="1"
-                                    />
+                                    <Checkbox v-model="editTalkPage" />
                                 </td>
                             </tr>
                             <tr>
@@ -120,19 +117,13 @@
                                     Edit to my user page
                                 </td>
                                 <td class="py-2">
-                                    <Checkbox
-                                        v-model="editUserPage"
-                                        checkbox-id="2"
-                                    />
+                                    <Checkbox v-model="editUserPage" />
                                 </td>
                             </tr>
                             <tr>
                                 <td class="py-2 pr-4 w-80">Page review</td>
                                 <td class="py-2">
-                                    <Checkbox
-                                        v-model="pageReview"
-                                        checkbox-id="3"
-                                    />
+                                    <Checkbox v-model="pageReview" />
                                 </td>
                             </tr>
                             <tr>
@@ -140,10 +131,7 @@
                                     Email from other user
                                 </td>
                                 <td class="py-2">
-                                    <Checkbox
-                                        v-model="emailFromOther"
-                                        checkbox-id="4"
-                                    />
+                                    <Checkbox v-model="emailFromOther" />
                                 </td>
                             </tr>
                             <tr>
@@ -151,10 +139,7 @@
                                     Successful mention
                                 </td>
                                 <td class="py-2">
-                                    <Checkbox
-                                        v-model="successfulMention"
-                                        checkbox-id="5"
-                                    />
+                                    <Checkbox v-model="successfulMention" />
                                 </td>
                             </tr>
                             <tr>
@@ -273,7 +258,7 @@ const saveNotifications = async () => {
     // Reset alert message
     showAlert.value = false
     try {
-        const response = await userService.saveNotifications({
+        const response = await userService.updateNotifications({
             editTalkPage: editTalkPage.value ? 1 : 0,
             editUserPage: editUserPage.value ? 1 : 0,
             pageReview: pageReview.value ? 1 : 0,

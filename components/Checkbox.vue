@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/html-self-closing -->
 <template>
     <div class="flex items-center space-x-2">
         <input
@@ -14,7 +15,7 @@
 import { defineEmits, defineProps } from 'vue'
 
 // Define props for checkbox
-const props = defineProps({
+defineProps({
     modelValue: {
         type: Boolean,
         default: false, // Default unchecked state
