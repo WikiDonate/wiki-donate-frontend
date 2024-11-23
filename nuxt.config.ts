@@ -3,7 +3,11 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     css: ['~/assets/css/main.css'],
     plugins: ['~/plugins/fontawesome.js'],
-    modules: ['@nuxt/eslint', '@pinia/nuxt'],
+    modules: [
+        '@nuxt/eslint',
+        '@pinia/nuxt',
+        'pinia-plugin-persistedstate/nuxt',
+    ],
     build: {
         transpile: ['vee-validate'],
     },
