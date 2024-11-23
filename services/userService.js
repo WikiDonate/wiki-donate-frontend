@@ -12,8 +12,18 @@ const changePassword = (params) => {
     return api.post('/changePassword', params)
 }
 
+const updateNotifications = (params) => {
+    return api.put('/user/notifications', params)
+}
+
+const getNotifications = () => {
+    return api.get('/user/notifications')
+}
+
 export const userService = {
     register,
     forgotPassword,
     changePassword,
+    updateNotifications,
+    getNotifications,
 }

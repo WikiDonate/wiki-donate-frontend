@@ -6,7 +6,7 @@
         <!-- Message -->
         <AlertMessage
             v-if="showAlert"
-            :variant="success"
+            :variant="alertVariant"
             :message="alertMessage"
             @close="showAlert = false"
         />
@@ -110,7 +110,7 @@
                                 </td>
                                 <td class="py-2">
                                     <Checkbox
-                                        v-model="talkPageChecked"
+                                        v-model="editTalkPage"
                                         checkbox-id="1"
                                     />
                                 </td>
@@ -121,7 +121,7 @@
                                 </td>
                                 <td class="py-2">
                                     <Checkbox
-                                        v-model="userPageChecked"
+                                        v-model="editUserPage"
                                         checkbox-id="2"
                                     />
                                 </td>
@@ -130,7 +130,7 @@
                                 <td class="py-2 pr-4 w-80">Page review</td>
                                 <td class="py-2">
                                     <Checkbox
-                                        v-model="pageReviewChecked"
+                                        v-model="pageReview"
                                         checkbox-id="3"
                                     />
                                 </td>
@@ -141,7 +141,7 @@
                                 </td>
                                 <td class="py-2">
                                     <Checkbox
-                                        v-model="emailFromUserChecked"
+                                        v-model="emailFromOther"
                                         checkbox-id="4"
                                     />
                                 </td>
@@ -152,7 +152,7 @@
                                 </td>
                                 <td class="py-2">
                                     <Checkbox
-                                        v-model="mentionChecked"
+                                        v-model="successfulMention"
                                         checkbox-id="5"
                                     />
                                 </td>
@@ -163,6 +163,7 @@
                                         text="Save"
                                         variant="primary"
                                         class="w-[100px] mt-4"
+                                        @click="saveNotifications()"
                                     />
                                 </td>
                             </tr>
@@ -254,12 +255,68 @@ useHead({
 const authStore = useAuthStore()
 
 // Active tab state
-const activeTab = ref('profile') // Default tab is 'profile'
-
+const activeTab = ref('profile')
+// Alert state
 const showAlert = ref(false)
 const alertVariant = ref('success')
 const alertMessage = ref('')
 const showAlertError = ref(false)
+// Preferences state
+const editTalkPage = ref(false)
+const editUserPage = ref(false)
+const pageReview = ref(false)
+const emailFromOther = ref(false)
+const successfulMention = ref(false)
+
+// Function to save preferences
+const saveNotifications = async () => {
+    // Reset alert message
+    showAlert.value = false
+    try {
+        const response = await userService.saveNotifications({
+            editTalkPage: editTalkPage.value ? 1 : 0,
+            editUserPage: editUserPage.value ? 1 : 0,
+            pageReview: pageReview.value ? 1 : 0,
+            emailFromOther: emailFromOther.value ? 1 : 0,
+            successfulMention: successfulMention.value ? 1 : 0,
+        })
+
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = response.errors[0]
+            showAlert.value = true
+            return
+        }
+
+        alertVariant.value = 'success'
+        alertMessage.value = response.message
+        showAlert.value = true
+        loadNotifications()
+    } catch (error) {
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        showAlert.value = true
+    }
+}
+
+// Function to load notification preferences
+const loadNotifications = async () => {
+    try {
+        const response = await userService.getNotifications()
+
+        if (Object.keys(response.data).length > 0) {
+            editTalkPage.value = response.data.editTalkPage === 1
+            editUserPage.value = response.data.editUserPage === 1
+            pageReview.value = response.data.pageReview === 1
+            emailFromOther.value = response.data.emailFromOther === 1
+            successfulMention.value = response.data.successfulMention === 1
+        }
+    } catch (error) {
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        showAlert.value = true
+    }
+}
 
 // Define validation schema
 const validationSchema = yup.object({
@@ -322,4 +379,8 @@ const closeModal = () => {
     isModalOpen.value = false
     resetForm()
 }
+
+onMounted(() => {
+    loadNotifications()
+})
 </script>

@@ -15,5 +15,3 @@ export const authService = {
     login,
     logout,
 }
-
-// Other authentication-related functions as needed
