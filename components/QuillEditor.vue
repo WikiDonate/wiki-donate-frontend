@@ -5,6 +5,7 @@
             v-model:content="content"
             :options="editorOptions"
             content-type="html"
+            @input="handleInput"
         />
     </ClientOnly>
 </template>
@@ -13,7 +14,10 @@
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import interact from 'interactjs'
-import { onMounted, ref } from 'vue'
+import { defineEmits, onMounted, ref } from 'vue'
+
+// Emits the updated content to the parent
+const emit = defineEmits(['update:content'])
 
 // Toolbar options
 const toolbarOptions = [
@@ -49,9 +53,7 @@ const editorOptions = ref({
 })
 
 // Define content with default text
-const content = ref(
-    '<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam.</p>'
-)
+const content = ref('') // Editor content
 
 const quillEditor = ref(null)
 
@@ -66,12 +68,14 @@ function imageHandler() {
         if (file) {
             const reader = new FileReader()
             reader.onload = (e) => {
-                const quill = quillEditor.value.getQuill()
-                const range = quill.getSelection()
-                if (range) {
-                    quill.insertEmbed(range.index, 'image', e.target.result)
-                    quill.setSelection(range.index + 1)
-                    enableImageManipulation()
+                const quill = quillEditor.value?.getQuill()
+                if (quill) {
+                    const range = quill.getSelection()
+                    if (range) {
+                        quill.insertEmbed(range.index, 'image', e.target.result)
+                        quill.setSelection(range.index + 1)
+                        enableImageManipulation()
+                    }
                 }
             }
             reader.readAsDataURL(file)
@@ -116,13 +120,12 @@ function dragMoveListener(event) {
 }
 
 // Alignment handler
-const alignmentHandler = (alignment) => {
-    const quill = quillEditor.value.getQuill()
-    const range = quill.getSelection()
-    if (range) {
-        const image = quill.getLeaf(range.index)[0].ops[0].insert.image // Get the image
-        if (image) {
-            quill.formatText(range.index, 1, { align: alignment }) // Apply alignment
+function alignmentHandler(alignment) {
+    const quill = quillEditor.value?.getQuill()
+    if (quill) {
+        const range = quill.getSelection()
+        if (range) {
+            quill.formatText(range.index, 1, { align: alignment })
         }
     }
 }
@@ -131,28 +134,75 @@ const alignmentHandler = (alignment) => {
 function setupAlignmentButtons() {
     const toolbar = document.querySelector('.ql-toolbar')
     if (toolbar) {
-        const leftButton = document.createElement('button')
-        leftButton.innerText = 'Align Left'
-        leftButton.classList.add('ql-align-left')
-        leftButton.onclick = () => alignmentHandler('left')
-
-        const centerButton = document.createElement('button')
-        centerButton.innerText = 'Align Center'
-        centerButton.classList.add('ql-align-center')
-        centerButton.onclick = () => alignmentHandler('center')
-
-        const rightButton = document.createElement('button')
-        rightButton.innerText = 'Align Right'
-        rightButton.classList.add('ql-align-right')
-        rightButton.onclick = () => alignmentHandler('right')
-
-        toolbar.appendChild(leftButton)
-        toolbar.appendChild(centerButton)
-        toolbar.appendChild(rightButton)
+        const createButton = (label, alignment) => {
+            const button = document.createElement('button')
+            button.innerText = label
+            button.onclick = () => alignmentHandler(alignment)
+            return button
+        }
+        toolbar.appendChild(createButton('Align Left', 'left'))
+        toolbar.appendChild(createButton('Align Center', 'center'))
+        toolbar.appendChild(createButton('Align Right', 'right'))
     }
 }
 
-// Call setupAlignmentButtons after the component mounts
+// Emit updated content on input
+function handleInput() {
+    const quill = quillEditor.value?.getQuill()
+    if (quill) {
+        const currentContent = quill.root.innerHTML // Get the editor content as HTML
+        emit('update:content', currentContent)
+    }
+}
+
+function setupTitleListener() {
+    const quill = quillEditor.value?.getQuill()
+
+    if (!quill) {
+        console.error('Quill instance not found')
+        return
+    }
+
+    quill.on('text-change', () => {
+        const text = quill.getText() // Get plain text of the editor
+        const match = text.match(/==(.+?)==/) // Match pattern `==AnyText==`
+
+        if (match) {
+            const startIndex = text.indexOf(match[0])
+            const sectionText = match[1]
+
+            // Remove the markers (i.e., '==' part)
+            quill.deleteText(startIndex, match[0].length)
+
+            // Insert the section text
+            quill.insertText(startIndex, sectionText)
+
+            // Apply Header 2 formatting to the line containing the section text
+            quill.formatLine(startIndex, 1, { header: 2 })
+
+            // Apply underline to the section text
+            quill.formatText(startIndex, sectionText.length, {
+                underline: true,
+            })
+
+            // Set the cursor to the end of the inserted text
+            quill.setSelection(startIndex + sectionText.length)
+        }
+    })
+}
+
+// Wait for QuillEditor to render
+onMounted(async () => {
+    await nextTick()
+    // Check if editor is ready
+    if (quillEditor.value) {
+        setupTitleListener()
+    } else {
+        console.error('QuillEditor is not ready')
+    }
+})
+
+// Initialize functionalities after mounting
 onMounted(() => {
     enableImageManipulation()
     setupAlignmentButtons()

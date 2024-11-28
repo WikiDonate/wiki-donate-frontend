@@ -22,11 +22,12 @@
                 done, preview the page to check for errors and then publish it.
             </p>
 
-            <!-- <TiptapEditor /> -->
-            <QuillEditor />
+            <!-- Editor -->
+            <QuillEditor v-model:content="editorContent" />
+            <p>Editor Content: {{ editorContent }}</p>
 
             <div class="w-40 mt-4">
-                <FormSubmitButton />
+                <FormSubmitButton @click="handleSubmit" />
             </div>
         </section>
     </main>
@@ -36,4 +37,9 @@
 useHead({
     title: 'Create Article',
 })
+
+const editorContent = ref('')
+const handleSubmit = () => {
+    console.log(editorContent.value)
+}
 </script>
