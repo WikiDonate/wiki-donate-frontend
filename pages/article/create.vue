@@ -13,6 +13,14 @@
             ]"
         />
 
+        <!-- Message -->
+        <AlertMessage
+            v-if="showAlert"
+            :variant="alertVariant"
+            :message="alertMessage"
+            @close="showAlert = false"
+        />
+
         <!-- create new article -->
         <section class="bg-white p-2">
             <p class="bg-white-100 mb-4 text-justify text-sm">
@@ -34,12 +42,58 @@
 </template>
 
 <script setup>
+import { articleService } from '~/services/articleService'
+
 useHead({
     title: 'Create Article',
 })
 
+const showAlert = ref(false)
+const alertVariant = ref('')
+const alertMessage = ref('')
 const editorContent = ref('')
-const handleSubmit = () => {
-    console.log(editorContent.value)
+
+const handleSubmit = async () => {
+    // Reset alert visibility
+    showAlert.value = false
+
+    try {
+        if (!editorContent.value) {
+            alertVariant.value = 'error'
+            alertMessage.value = 'Please enter some content'
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        // Save article
+        const params = {
+            content: editorContent.value,
+        }
+
+        const response = await articleService.saveArticle(params)
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = response.errors[0]
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        alertVariant.value = 'success'
+        alertMessage.value = response.message
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+    } catch (error) {
+        console.error(error)
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+    }
 }
 </script>
