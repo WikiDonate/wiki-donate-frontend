@@ -16,10 +16,11 @@ const saveArticle = (params) => {
 //     return api.post('/user/notifications', params)
 // }
 
-// const getNotifications = () => {
-//     return api.get('/user/notifications')
-// }
+const searchArticles = (query) => {
+    return api.get('/search?query=' + query)
+}
 
 export const articleService = {
     saveArticle,
+    searchArticles,
 }

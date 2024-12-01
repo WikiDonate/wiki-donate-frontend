@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/html-self-closing -->
 <template>
     <div ref="searchContainer" class="relative w-full">
         <form class="flex" @submit.prevent="handleSearch">
@@ -39,6 +40,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { articleService } from '~/services/articleService'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -47,11 +49,14 @@ const searchContainer = ref(null)
 
 const fetchSuggestions = async () => {
     if (searchQuery.value.length > 2) {
-        const response = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(searchQuery.value)}&format=json&origin=*`
-        )
-        const data = await response.json()
-        suggestions.value = data[1] // Suggestions array
+        try {
+            const response = await articleService.searchArticles(
+                searchQuery.value
+            )
+            suggestions.value = response.data.map((article) => article.title)
+        } catch (error) {
+            console.error(error)
+        }
     } else {
         suggestions.value = []
     }
