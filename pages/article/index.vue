@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/html-self-closing -->
+<!-- eslint-disable vue/no-v-html -->
 <!-- existing article page -->
 <template>
     <main class="w-full">
@@ -13,68 +15,125 @@
             ]"
         />
 
+        <!-- Message -->
+        <div class="mt-2">
+            <AlertMessage
+                v-if="showAlert"
+                :variant="alertVariant"
+                :message="alertMessage"
+                @close="showAlert = false"
+            />
+        </div>
+
         <!-- article page -->
         <section class="bg-white p-2">
             <div class="flex border-b border-b-gray-300 items-center mb-2">
-                <h2 class="font-bold text-xl mr-2">Arts and entertainment</h2>
-                <NuxtLink to="/article/edit-source" exact
-                    >[<span class="text-blue-500 text-sm">edit source</span
-                    >]</NuxtLink
-                >
-            </div>
-
-            <p class="bg-white-100 mb-4 text-justify text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime
-                mollitia, molestiae quas vel sint commodi repudiandae
-                consequuntur voluptatum laborum numquam blanditiis harum
-                quisquam eius sed odit fugiat iusto fuga praesentium optio,
-                eaque rerum! Provident similique accusantium nemo autem.
-                Veritatis obcaecati tenetur iure eius earum ut molestias
-                architecto voluptate aliquam
-            </p>
-        </section>
-
-        <section class="bg-white p-2">
-            <div class="flex border-b border-b-gray-300 items-center mb-2">
                 <h2 class="font-bold text-xl mr-2">
-                    Businesses and organizations
+                    {{ articleTitle || title }}
                 </h2>
-                <NuxtLink to="/article/edit-source" exact
-                    >[<span class="text-blue-500 text-sm">edit source</span
-                    >]</NuxtLink
-                >
             </div>
-            <ul class="list-disc pl-5">
-                <li class="mb-2">
-                    BB Bloggingsbooks, an imprint of OmniScriptum
-                </li>
-                <li class="mb-2">
-                    BB Microlight, a Hungarian aircraft manufacturer
-                </li>
-                <li class="mb-2">
-                    Banco do Brasil, a Brazilian financial services company
-                </li>
-                <li class="mb-2">
-                    Bavarian Peasants' League (Bayerischer Bauernbund), a former
-                    German political party
-                </li>
-                <li class="mb-2">
-                    BlackBerry Limited (stock ticker BB), Canadian technology
-                    company
-                </li>
-                <li class="mb-2">
-                    Borderland Beat, a news blog covering the Mexican drug war
-                </li>
-                <li class="mb-2">
-                    Boys' Brigade, a Christian youth organization
-                </li>
-            </ul>
+            <div v-if="article.length === 0">
+                <div>
+                    <QuillEditor v-model:content="editorContent" />
+                </div>
+                <div class="w-40 mt-4">
+                    <FormSubmitButton @click="handleSubmit" />
+                </div>
+            </div>
+            <div v-else>
+                <div v-for="item in article" :key="item.uuid">
+                    <div v-html="item.title" />
+                    <div v-html="item.content" />
+                    <br />
+                </div>
+            </div>
         </section>
     </main>
 </template>
 
 <script setup>
+import { articleService } from '~/services/articleService'
+
 useHead({
     title: 'Article',
+})
+
+const route = useRoute()
+const title = route.query.title
+const showAlert = ref(false)
+const alertVariant = ref('')
+const alertMessage = ref('')
+const editorContent = ref('')
+const articleTitle = ref('')
+const article = ref({})
+
+const handleSubmit = async () => {
+    showAlert.value = false
+
+    try {
+        if (!editorContent.value) {
+            alertVariant.value = 'error'
+            alertMessage.value = 'Please enter some content'
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        // Save article
+        const params = {
+            title: title,
+            content: editorContent.value,
+        }
+
+        const response = await articleService.saveArticle(params)
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = response.errors[0]
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        alertVariant.value = 'success'
+        alertMessage.value = response.message
+        setTimeout(() => {
+            showAlert.value = true
+            loadArticle(title)
+        }, 0)
+    } catch (error) {
+        console.error(error)
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+    }
+}
+
+const loadArticle = async (slug) => {
+    try {
+        const response = await articleService.getArticle(slug)
+        if (response.success) {
+            articleTitle.value = response.data.title
+            article.value = response.data.sections
+        } else {
+            article.value = []
+        }
+    } catch (error) {
+        article.value = []
+        console.error(error)
+    }
+}
+
+onMounted(() => {
+    loadArticle(title)
+})
+
+watch(route, (newRoute) => {
+    if (newRoute.query.title) {
+        loadArticle(newRoute.query.title)
+    }
 })
 </script>

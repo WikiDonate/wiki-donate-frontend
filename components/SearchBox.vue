@@ -30,7 +30,7 @@
                     class="cursor-pointer hover:bg-gray-200 px-4 py-2"
                     @click="selectSuggestion(suggestion)"
                 >
-                    {{ suggestion }}
+                    {{ suggestion.title }}
                 </li>
             </ul>
         </div>
@@ -53,7 +53,7 @@ const fetchSuggestions = async () => {
             const response = await articleService.searchArticles(
                 searchQuery.value
             )
-            suggestions.value = response.data.map((article) => article.title)
+            suggestions.value = response.data
         } catch (error) {
             console.error(error)
         }
@@ -63,20 +63,24 @@ const fetchSuggestions = async () => {
 }
 
 const handleSearch = () => {
-    if (suggestions.value.length > 0) {
-        const searchUrl = `/article?title=${encodeURIComponent(suggestions.value[0])}`
-        suggestions.value = [] // Clear suggestions
+    if (searchQuery.value) {
+        let searchUrl = `/article?title=${encodeURIComponent(searchQuery.value)}`
+        const foundSuggestion = suggestions.value.find(
+            (suggestion) => suggestion.title === searchQuery.value
+        )
+
+        if (foundSuggestion) {
+            searchUrl = `/article?title=${encodeURIComponent(foundSuggestion.slug)}`
+        }
+
+        suggestions.value = []
         router.push(searchUrl)
-    } else {
-        suggestions.value = [] // Clear suggestions
-        const createUrl = `/article/new?title=${encodeURIComponent(searchQuery.value)}`
-        router.push(createUrl)
     }
 }
 
 const selectSuggestion = (suggestion) => {
-    searchQuery.value = suggestion
-    const searchUrl = `/article?title=${encodeURIComponent(searchQuery.value)}`
+    searchQuery.value = suggestion.title
+    const searchUrl = `/article?title=${encodeURIComponent(suggestion.slug)}`
     suggestions.value = []
     router.push(searchUrl)
 }

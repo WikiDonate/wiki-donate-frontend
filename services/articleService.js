@@ -1,7 +1,15 @@
 import api from '../config/apiConfig'
 
+const searchArticles = (query) => {
+    return api.get('/search?query=' + query)
+}
+
 const saveArticle = (params) => {
-    return api.post('/articles', params)
+    return api.post('/articles/article', params)
+}
+
+const getArticle = (slug) => {
+    return api.get(`/articles/article/${slug}`)
 }
 
 // const forgotPassword = (params) => {
@@ -16,11 +24,8 @@ const saveArticle = (params) => {
 //     return api.post('/user/notifications', params)
 // }
 
-const searchArticles = (query) => {
-    return api.get('/search?query=' + query)
-}
-
 export const articleService = {
-    saveArticle,
     searchArticles,
+    saveArticle,
+    getArticle,
 }

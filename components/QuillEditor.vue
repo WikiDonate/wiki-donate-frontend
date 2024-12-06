@@ -5,6 +5,7 @@
             v-model:content="content"
             :options="editorOptions"
             content-type="html"
+            placeholder="Create an article..."
             @input="handleInput"
         />
     </ClientOnly>
