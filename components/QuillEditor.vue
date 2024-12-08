@@ -17,6 +17,13 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import interact from 'interactjs'
 import { defineEmits, onMounted, ref } from 'vue'
 
+const props = defineProps({
+    initialContent: {
+        type: String,
+        default: '',
+    },
+})
+
 // Emits the updated content to the parent
 const emit = defineEmits(['update:content'])
 
@@ -195,6 +202,7 @@ function setupTitleListener() {
 // Wait for QuillEditor to render
 onMounted(async () => {
     await nextTick()
+    content.value = props.initialContent
     // Check if editor is ready
     if (quillEditor.value) {
         setupTitleListener()

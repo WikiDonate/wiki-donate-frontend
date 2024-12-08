@@ -12,6 +12,10 @@ const getArticle = (slug) => {
     return api.get(`/articles/article/${slug}`)
 }
 
+const getSection = (uuid) => {
+    return api.get(`/articles/section/${uuid}`)
+}
+
 // const forgotPassword = (params) => {
 //     return api.post('/forgotPassword', params)
 // }
@@ -28,4 +32,5 @@ export const articleService = {
     searchArticles,
     saveArticle,
     getArticle,
+    getSection,
 }

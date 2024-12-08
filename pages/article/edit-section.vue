@@ -30,54 +30,70 @@
             />
         </div>
 
-        <!-- article page -->
+        <!-- Content -->
         <section class="bg-white p-2">
             <div class="flex border-b border-b-gray-300 items-center mb-2">
                 <h2 class="font-bold text-xl mr-2">
-                    {{ articleTitle || title }}
+                    {{ title }}
                 </h2>
             </div>
-            <div v-if="article.length === 0">
-                <div>
-                    <QuillEditor v-model:content="editorContent" />
-                </div>
-                <div class="w-40 mt-4">
-                    <FormSubmitButton @click="handleSubmit" />
-                </div>
+            <div>
+                <QuillEditor
+                    v-if="editorContent"
+                    v-model:content="editorContent"
+                    :initial-content="editorContent"
+                />
             </div>
-            <div v-else>
-                <div v-for="item in article" :key="item.uuid">
-                    <div class="flex justify-between">
-                        <div v-html="item.title" />
-                        <NuxtLink
-                            :to="`/article/edit-section?title=${title}&uuid=${item.uuid}`"
-                            exact
-                            >[Edit]</NuxtLink
-                        >
-                    </div>
-                    <div v-html="item.content" />
-                    <br />
-                </div>
+            <div class="w-40 mt-4">
+                <FormSubmitButton text="Update" @click="handleSubmit" />
             </div>
         </section>
     </main>
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue'
 import { articleService } from '~/services/articleService'
 
 useHead({
-    title: 'Article',
+    title: 'Edit Section',
 })
 
 const route = useRoute()
 const title = route.query.title
+const uuid = route.query.uuid || ''
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
 const editorContent = ref('')
-const articleTitle = ref('')
-const article = ref({})
+const section = ref({})
+
+const loadSection = async (uuid) => {
+    try {
+        const response = await articleService.getSection(uuid)
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = 'Please enter some content'
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        section.value = response.data
+        editorContent.value =
+            response.data.title + '\n\n' + response.data.content
+
+        console.log(editorContent.value)
+    } catch (error) {
+        console.error(error)
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+    }
+}
 
 const handleSubmit = async () => {
     showAlert.value = false
@@ -124,28 +140,7 @@ const handleSubmit = async () => {
     }
 }
 
-const loadArticle = async (slug) => {
-    try {
-        const response = await articleService.getArticle(slug)
-        if (response.success) {
-            articleTitle.value = response.data.title
-            article.value = response.data.sections
-        } else {
-            article.value = []
-        }
-    } catch (error) {
-        article.value = []
-        console.error(error)
-    }
-}
-
-onMounted(() => {
-    loadArticle(title)
-})
-
-watch(route, (newRoute) => {
-    if (newRoute.query.title) {
-        loadArticle(newRoute.query.title)
-    }
+onMounted(async () => {
+    await loadSection(uuid)
 })
 </script>
