@@ -60,6 +60,7 @@ useHead({
 })
 
 const route = useRoute()
+const router = useRouter()
 const title = route.query.title
 const uuid = route.query.uuid || ''
 const showAlert = ref(false)
@@ -83,8 +84,6 @@ const loadSection = async (uuid) => {
         section.value = response.data
         editorContent.value =
             response.data.title + '\n\n' + response.data.content
-
-        console.log(editorContent.value)
     } catch (error) {
         console.error(error)
         alertVariant.value = 'error'
@@ -108,13 +107,13 @@ const handleSubmit = async () => {
             return
         }
 
-        // Save article
+        // Prepare params
         const params = {
-            title: title,
+            uuid: section.value.uuid,
             content: editorContent.value,
         }
 
-        const response = await articleService.saveArticle(params)
+        const response = await articleService.updateSection(params)
         if (!response.success) {
             alertVariant.value = 'error'
             alertMessage.value = response.errors[0]
@@ -124,14 +123,8 @@ const handleSubmit = async () => {
             return
         }
 
-        alertVariant.value = 'success'
-        alertMessage.value = response.message
-        setTimeout(() => {
-            showAlert.value = true
-            loadArticle(title)
-        }, 0)
+        router.push(`/article?title=${title}`)
     } catch (error) {
-        console.error(error)
         alertVariant.value = 'error'
         alertMessage.value = error.errors[0]
         setTimeout(() => {

@@ -16,6 +16,10 @@ const getSection = (uuid) => {
     return api.get(`/articles/section/${uuid}`)
 }
 
+const updateSection = (params) => {
+    return api.put(`/articles/section/${params.uuid}`, params)
+}
+
 // const forgotPassword = (params) => {
 //     return api.post('/forgotPassword', params)
 // }
@@ -33,4 +37,5 @@ export const articleService = {
     saveArticle,
     getArticle,
     getSection,
+    updateSection,
 }

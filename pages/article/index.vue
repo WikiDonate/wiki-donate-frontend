@@ -139,8 +139,8 @@ const loadArticle = async (slug) => {
     }
 }
 
-onMounted(() => {
-    loadArticle(title)
+onMounted(async () => {
+    await loadArticle(title)
 })
 
 watch(route, (newRoute) => {
