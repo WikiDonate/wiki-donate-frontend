@@ -6,12 +6,18 @@
         <!-- Top bar -->
         <TopBar
             :left-menu-items="[
-                { name: 'Article', link: '/article' },
-                { name: 'Talk', link: '/article/talk' },
+                { name: 'Article', link: '/article?title=' + title },
+                // { name: 'Talk', link: '/article/talk' },
             ]"
             :right-menu-items="[
-                { name: 'Edit Source', link: '/article/edit-source' },
-                { name: 'View History', link: '/article/view-history' },
+                {
+                    name: 'Edit Source',
+                    link: '/article/edit-source?title=' + title,
+                },
+                {
+                    name: 'View History',
+                    link: '/article/view-history?title=' + title,
+                },
             ]"
         />
 
@@ -56,7 +62,37 @@
 </template>
 
 <script setup>
+import { articleService } from '~/services/articleService'
+
 useHead({
     title: 'View History',
+})
+
+const route = useRoute()
+const title = route.query.title
+const articleTitle = ref('')
+const article = ref({})
+const articleSections = ref({})
+
+const loadArticle = async (slug) => {
+    try {
+        const response = await articleService.getArticle(slug)
+        if (response.success) {
+            articleTitle.value = response.data.title
+            article.value = response.data
+            articleSections.value = response.data.sections
+        } else {
+            article.value = []
+            articleSections.value = []
+        }
+    } catch (error) {
+        article.value = []
+        articleSections.value = []
+        console.error(error)
+    }
+}
+
+onMounted(async () => {
+    await loadArticle(title)
 })
 </script>
