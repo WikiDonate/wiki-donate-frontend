@@ -20,6 +20,10 @@ const updateSection = (params) => {
     return api.put(`/articles/section/${params.uuid}`, params)
 }
 
+const getHistory = (slug) => {
+    return api.get(`/articles/history/${slug}`)
+}
+
 // const forgotPassword = (params) => {
 //     return api.post('/forgotPassword', params)
 // }
@@ -38,4 +42,5 @@ export const articleService = {
     getArticle,
     getSection,
     updateSection,
+    getHistory,
 }

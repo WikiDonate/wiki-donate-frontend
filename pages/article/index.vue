@@ -37,7 +37,7 @@
                     {{ articleTitle || title }}
                 </h2>
             </div>
-            <div v-if="article.length === 0">
+            <div v-if="sections.length === 0">
                 <div>
                     <QuillEditor v-model:content="editorContent" />
                 </div>
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div v-else>
-                <div v-for="item in article" :key="item.uuid">
+                <div v-for="item in sections" :key="item.uuid">
                     <div class="flex justify-between">
                         <div v-html="item.title" />
                         <NuxtLink
@@ -77,7 +77,7 @@ const alertVariant = ref('')
 const alertMessage = ref('')
 const editorContent = ref('')
 const articleTitle = ref('')
-const article = ref({})
+const sections = ref({})
 
 const handleSubmit = async () => {
     showAlert.value = false
@@ -112,7 +112,7 @@ const handleSubmit = async () => {
         alertMessage.value = response.message
         setTimeout(() => {
             showAlert.value = true
-            loadArticle(title)
+            loadArticle(response.data.slug)
         }, 0)
     } catch (error) {
         console.error(error)
@@ -129,12 +129,12 @@ const loadArticle = async (slug) => {
         const response = await articleService.getArticle(slug)
         if (response.success) {
             articleTitle.value = response.data.title
-            article.value = response.data.sections
+            sections.value = response.data.sections
         } else {
-            article.value = []
+            sections.value = []
         }
     } catch (error) {
-        article.value = []
+        sections.value = []
         console.error(error)
     }
 }
