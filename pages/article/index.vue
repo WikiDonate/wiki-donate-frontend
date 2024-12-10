@@ -70,6 +70,7 @@ useHead({
     title: 'Article',
 })
 
+const articleStore = useArticleStore()
 const route = useRoute()
 const title = route.query.title
 const showAlert = ref(false)
@@ -130,11 +131,14 @@ const loadArticle = async (slug) => {
         if (response.success) {
             articleTitle.value = response.data.title
             sections.value = response.data.sections
+            articleStore.addArticle(response.data)
         } else {
             sections.value = []
+            articleStore.clearArticle()
         }
     } catch (error) {
         sections.value = []
+        articleStore.clearArticle()
         console.error(error)
     }
 }

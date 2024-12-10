@@ -59,6 +59,7 @@ useHead({
     title: 'Edit Section',
 })
 
+const articleStore = useArticleStore()
 const route = useRoute()
 const router = useRouter()
 const title = route.query.title
@@ -82,8 +83,7 @@ const loadSection = async (uuid) => {
         }
 
         section.value = response.data
-        editorContent.value =
-            response.data.title + '\n\n' + response.data.content
+        editorContent.value = response.data.title + '\n' + response.data.content
     } catch (error) {
         console.error(error)
         alertVariant.value = 'error'
@@ -123,7 +123,9 @@ const handleSubmit = async () => {
             return
         }
 
-        router.push(`/article?title=${title}`)
+        router.push(
+            `/article?title=${encodeURIComponent(articleStore.article.slug)}`
+        )
     } catch (error) {
         alertVariant.value = 'error'
         alertMessage.value = error.errors[0]

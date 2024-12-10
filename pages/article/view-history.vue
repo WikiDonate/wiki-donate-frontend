@@ -2,8 +2,9 @@
 <!-- view history page -->
 <template>
     <main class="w-full">
-        <!-- Topbar Title -->
+        <!-- Top bar Title -->
         <TopBarTitle :page-title="`${title}: Revision history`" />
+
         <!-- Top bar -->
         <TopBar
             :left-menu-items="[
