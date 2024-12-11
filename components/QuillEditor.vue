@@ -1,14 +1,16 @@
 <template>
-    <ClientOnly>
-        <QuillEditor
-            ref="quillEditor"
-            v-model:content="content"
-            :options="editorOptions"
-            content-type="html"
-            placeholder="Create an article..."
-            @input="handleInput"
-        />
-    </ClientOnly>
+    <div translate="no">
+        <ClientOnly>
+            <QuillEditor
+                ref="quillEditor"
+                v-model:content="content"
+                :options="editorOptions"
+                content-type="html"
+                placeholder="Create an article..."
+                @input="handleInput"
+            />
+        </ClientOnly>
+    </div>
 </template>
 
 <script setup>
@@ -173,7 +175,7 @@ function setupTitleListener() {
 
     quill.on('text-change', () => {
         const text = quill.getText() // Get plain text of the editor
-        const match = text.match(/==(.+?)==/) // Match pattern `==AnyText==`
+        const match = text.match(/===(.+?)===/) // Match pattern `===AnyText===`
 
         if (match) {
             const startIndex = text.indexOf(match[0])
