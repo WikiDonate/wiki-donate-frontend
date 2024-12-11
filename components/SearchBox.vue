@@ -48,7 +48,7 @@ const suggestions = ref([])
 const searchContainer = ref(null)
 
 const fetchSuggestions = async () => {
-    if (searchQuery.value.length > 2) {
+    if (searchQuery.value.length > 1) {
         try {
             const response = await articleService.searchArticles(
                 searchQuery.value
@@ -64,7 +64,7 @@ const fetchSuggestions = async () => {
 
 const handleSearch = () => {
     if (searchQuery.value) {
-        let searchUrl = `/article?title=${encodeURIComponent(searchQuery.value)}`
+        let searchUrl = `/article/new?title=${encodeURIComponent(searchQuery.value)}`
         const foundSuggestion = suggestions.value.find(
             (suggestion) => suggestion.title === searchQuery.value
         )

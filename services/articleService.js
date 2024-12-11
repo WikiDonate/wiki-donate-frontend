@@ -5,11 +5,11 @@ const searchArticles = (query) => {
 }
 
 const saveArticle = (params) => {
-    return api.post('/articles/article', params)
+    return api.post('/articles', params)
 }
 
 const getArticle = (slug) => {
-    return api.get(`/articles/article/${slug}`)
+    return api.get(`/articles/${slug}`)
 }
 
 const getSection = (uuid) => {
@@ -23,18 +23,6 @@ const updateSection = (params) => {
 const getHistory = (slug) => {
     return api.get(`/articles/history/${slug}`)
 }
-
-// const forgotPassword = (params) => {
-//     return api.post('/forgotPassword', params)
-// }
-
-// const changePassword = (params) => {
-//     return api.post('/changePassword', params)
-// }
-
-// const updateNotifications = (params) => {
-//     return api.post('/user/notifications', params)
-// }
 
 export const articleService = {
     searchArticles,
