@@ -46,11 +46,14 @@
                 </div>
             </div>
             <div v-else>
-                <div v-for="item in sections" :key="item.uuid">
+                <div
+                    v-for="(item, index) in sections"
+                    :key="`section-${index}`"
+                >
                     <div class="flex justify-between">
                         <div v-html="item.title" />
                         <NuxtLink
-                            :to="`/article/edit-section?title=${title}&uuid=${item.uuid}`"
+                            :to="`/article/edit-section?title=${title}&uuid=${index}`"
                             exact
                             >[Edit]</NuxtLink
                         >
@@ -130,7 +133,7 @@ const loadArticle = async (slug) => {
         const response = await articleService.getArticle(slug)
         if (response.success) {
             articleTitle.value = response.data.title
-            sections.value = response.data.sections
+            sections.value = JSON.parse(response.data.sections)
             articleStore.addArticle(response.data)
         } else {
             sections.value = []

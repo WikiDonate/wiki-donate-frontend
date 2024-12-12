@@ -31,7 +31,7 @@
         </div>
 
         <!-- Content -->
-        <section class="bg-white p-2">
+        <section v-if="editorContent" class="bg-white p-2">
             <div class="flex border-b border-b-gray-300 items-center mb-2">
                 <h2 class="font-bold text-xl mr-2">
                     {{ title }}
@@ -71,27 +71,21 @@ const editorContent = ref('')
 const section = ref({})
 
 const loadSection = async (uuid) => {
-    try {
-        const response = await articleService.getSection(uuid)
-        if (!response.success) {
-            alertVariant.value = 'error'
-            alertMessage.value = 'Please enter some content'
-            setTimeout(() => {
-                showAlert.value = true
-            }, 0)
-            return
-        }
+    section.value = JSON.parse(articleStore.article.sections).find(
+        (item, idx) => idx == uuid
+    )
 
-        section.value = response.data
-        editorContent.value = response.data.title + '\n' + response.data.content
-    } catch (error) {
-        console.error(error)
+    if (!section.value) {
         alertVariant.value = 'error'
-        alertMessage.value = error.errors[0]
+        alertMessage.value = 'Section not found'
         setTimeout(() => {
             showAlert.value = true
         }, 0)
+
+        return
     }
+
+    editorContent.value = section.value.title + '' + section.value.content
 }
 
 const handleSubmit = async () => {
@@ -107,13 +101,27 @@ const handleSubmit = async () => {
             return
         }
 
+        const content = JSON.parse(articleStore.article.sections)
+        content[uuid] = editorContent.value
+
+        let resultString = ''
+        content.forEach((item) => {
+            if (typeof item === 'string') {
+                resultString += item
+            } else {
+                if (item.title) resultString += item.title
+                if (item.content) resultString += item.content
+            }
+        })
+
         // Prepare params
         const params = {
-            uuid: section.value.uuid,
-            content: editorContent.value,
+            title: articleStore.article.title,
+            slug: articleStore.article.slug,
+            content: resultString,
         }
 
-        const response = await articleService.updateSection(params)
+        const response = await articleService.updateArticle(params)
         if (!response.success) {
             alertVariant.value = 'error'
             alertMessage.value = response.errors[0]

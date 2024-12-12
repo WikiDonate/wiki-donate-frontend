@@ -16,8 +16,8 @@ const getSection = (uuid) => {
     return api.get(`/articles/section/${uuid}`)
 }
 
-const updateSection = (params) => {
-    return api.put(`/articles/section/${params.uuid}`, params)
+const updateArticle = (params) => {
+    return api.put(`/articles/update/${params.slug}`, params)
 }
 
 const getHistory = (slug) => {
@@ -29,6 +29,6 @@ export const articleService = {
     saveArticle,
     getArticle,
     getSection,
-    updateSection,
+    updateArticle,
     getHistory,
 }
