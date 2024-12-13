@@ -22,6 +22,16 @@
             ]"
         />
 
+        <!-- Message -->
+        <div class="mt-2">
+            <AlertMessage
+                v-if="showAlert"
+                :variant="alertVariant"
+                :message="alertMessage"
+                @close="showAlert = false"
+            />
+        </div>
+
         <!-- edit source section -->
         <section class="bg-white p-2 mt-4">
             <div>
@@ -45,7 +55,12 @@ useHead({
     title: 'Edit Source',
 })
 
+const articleStore = useArticleStore()
 const route = useRoute()
+const router = useRouter()
+const showAlert = ref(false)
+const alertVariant = ref('')
+const alertMessage = ref('')
 const title = route.query.title
 const articleTitle = ref('')
 const article = ref({})
@@ -56,19 +71,71 @@ const loadArticle = async (slug) => {
         const response = await articleService.getArticle(slug)
         if (response.success) {
             articleTitle.value = response.data.title
-            article.value = response.data
-            editorContent.value = response.data.sections
-                .map(
-                    (section) =>
-                        `<!-- ${section.uuid} -->\n${section.title}\n${section.content}`
-                )
-                .join('\n')
+            article.value = JSON.parse(response.data.sections)
+
+            let articleString = ''
+            article.value.forEach((item) => {
+                if (typeof item === 'string') {
+                    articleString += item
+                } else {
+                    if (item.title) articleString += item.title
+                    if (item.content) articleString += item.content
+                }
+            })
+
+            editorContent.value = articleString
+            articleStore.addArticle(response.data)
         } else {
             article.value = []
+            articleStore.clearArticle()
         }
     } catch (error) {
-        article.value = []
+        sections.value = []
+        articleStore.clearArticle()
         console.error(error)
+    }
+}
+
+const handleSubmit = async () => {
+    showAlert.value = false
+
+    try {
+        if (!editorContent.value) {
+            alertVariant.value = 'error'
+            alertMessage.value = 'Please enter some content'
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        // Prepare params
+        const params = {
+            title: articleStore.article.title,
+            slug: articleStore.article.slug,
+            content: editorContent.value,
+        }
+
+        const response = await articleService.updateArticle(params)
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = response.errors[0]
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        router.push(
+            `/article?title=${encodeURIComponent(articleStore.article.slug)}`
+        )
+    } catch (error) {
+        console.error(error)
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
     }
 }
 
