@@ -12,10 +12,6 @@ const getArticle = (slug) => {
     return api.get(`/articles/${slug}`)
 }
 
-const getSection = (uuid) => {
-    return api.get(`/articles/section/${uuid}`)
-}
-
 const updateArticle = (params) => {
     return api.put(`/articles/update/${params.slug}`, params)
 }
@@ -28,7 +24,6 @@ export const articleService = {
     searchArticles,
     saveArticle,
     getArticle,
-    getSection,
     updateArticle,
     getHistory,
 }
