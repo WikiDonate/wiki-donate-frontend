@@ -21,7 +21,7 @@ const updateArticle = (params) => {
 }
 
 const getHistory = (slug) => {
-    return api.get(`/articles/history/${slug}`)
+    return api.get(`/articles/${slug}/history`)
 }
 
 export const articleService = {
