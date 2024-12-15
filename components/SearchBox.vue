@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/html-self-closing -->
 <template>
     <div ref="searchContainer" class="relative w-full">
         <form class="flex" @submit.prevent="handleSearch">
@@ -29,7 +30,7 @@
                     class="cursor-pointer hover:bg-gray-200 px-4 py-2"
                     @click="selectSuggestion(suggestion)"
                 >
-                    {{ suggestion }}
+                    {{ suggestion.title }}
                 </li>
             </ul>
         </div>
@@ -39,6 +40,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { articleService } from '~/services/articleService'
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -46,32 +48,39 @@ const suggestions = ref([])
 const searchContainer = ref(null)
 
 const fetchSuggestions = async () => {
-    if (searchQuery.value.length > 2) {
-        const response = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(searchQuery.value)}&format=json&origin=*`
-        )
-        const data = await response.json()
-        suggestions.value = data[1] // Suggestions array
+    if (searchQuery.value.length > 1) {
+        try {
+            const response = await articleService.searchArticles(
+                searchQuery.value
+            )
+            suggestions.value = response.data
+        } catch (error) {
+            console.error(error)
+        }
     } else {
         suggestions.value = []
     }
 }
 
 const handleSearch = () => {
-    if (suggestions.value.length > 0) {
-        const searchUrl = `/article?title=${encodeURIComponent(suggestions.value[0])}`
-        suggestions.value = [] // Clear suggestions
+    if (searchQuery.value) {
+        let searchUrl = `/article/new?title=${encodeURIComponent(searchQuery.value)}`
+        const foundSuggestion = suggestions.value.find(
+            (suggestion) => suggestion.title === searchQuery.value
+        )
+
+        if (foundSuggestion) {
+            searchUrl = `/article?title=${encodeURIComponent(foundSuggestion.slug)}`
+        }
+
+        suggestions.value = []
         router.push(searchUrl)
-    } else {
-        suggestions.value = [] // Clear suggestions
-        const createUrl = `/article/new?title=${encodeURIComponent(searchQuery.value)}`
-        router.push(createUrl)
     }
 }
 
 const selectSuggestion = (suggestion) => {
-    searchQuery.value = suggestion
-    const searchUrl = `/article?title=${encodeURIComponent(searchQuery.value)}`
+    searchQuery.value = suggestion.title
+    const searchUrl = `/article?title=${encodeURIComponent(suggestion.slug)}`
     suggestions.value = []
     router.push(searchUrl)
 }

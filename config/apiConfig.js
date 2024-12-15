@@ -31,6 +31,7 @@ instance.interceptors.response.use(
     (res) => {
         if (res.status === 401) {
             localStorage.clear()
+            window.location.href = '/login'
         }
         return res.data
     },
@@ -38,6 +39,7 @@ instance.interceptors.response.use(
         if (error.response) {
             if (error.response.status === 401) {
                 localStorage.clear()
+                window.location.href = '/login'
             }
             return Promise.reject(error.response.data)
         }

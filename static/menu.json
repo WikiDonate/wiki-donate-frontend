@@ -6,12 +6,6 @@
         "onLogin": ""
     },
     {
-        "name": "Contact Us",
-        "link": "/contact",
-        "type": "MainMenu",
-        "onLogin": ""
-    },
-    {
         "name": "Donate",
         "link": "/donate",
         "type": "",

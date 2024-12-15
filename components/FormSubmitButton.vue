@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/require-explicit-emits -->
 <template>
-    <button :class="buttonClasses" @click="$emit('click')">
+    <button :class="buttonClasses" v-bind="$attrs" @click="$emit('submit')">
         <slot>{{ text }}</slot>
     </button>
 </template>

@@ -39,10 +39,8 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
-
 // Props for dynamic menu items
-const props = defineProps({
+defineProps({
     leftMenuItems: {
         type: Array,
         default: () => [],
@@ -53,6 +51,8 @@ const props = defineProps({
     },
 })
 
-const route = useRoute()
-const isActiveRoute = (path, route) => route.path === path
+// const route = useRoute()
+const isActiveRoute = (path, route) => {
+    return route.href === path
+}
 </script>

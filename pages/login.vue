@@ -70,7 +70,7 @@
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { authService } from '~/services/authService'
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from '~/stores/authStore'
 
 useHead({
     title: 'Login',
