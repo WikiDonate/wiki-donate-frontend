@@ -1,7 +1,7 @@
 import api from '../config/apiConfig'
 
 const register = (params) => {
-    return api.post('/register', params)
+    return api.post('/user', params)
 }
 
 const forgotPassword = (params) => {
