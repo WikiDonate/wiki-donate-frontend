@@ -175,7 +175,7 @@ function setupTitleListener() {
 
     quill.on('text-change', () => {
         const text = quill.getText() // Get plain text of the editor
-        const match = text.match(/===(.+?)===/) // Match pattern `===AnyText===`
+        const match = text.match(/==(.+?)==/) // Match pattern `===AnyText===`
 
         if (match) {
             const startIndex = text.indexOf(match[0])
