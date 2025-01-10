@@ -33,6 +33,23 @@
                         />
                     </div>
 
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label
+                            for="email"
+                            class="block text-sm font-medium text-gray-700"
+                            >Email
+                        </label>
+                        <FormInput
+                            v-model="email"
+                            type="email"
+                            placeholder="Enter your email"
+                            class="mb-3"
+                            v-bind="emailProps"
+                            :error-message="errors['email']"
+                        />
+                    </div>
+
                     <!-- Card Number -->
                     <div class="mb-4">
                         <label
@@ -150,6 +167,10 @@ const validationSchema = yup.object({
         .string()
         .required('Card Number is required')
         .matches(/^\d{16}$/, 'Card number must be exactly 16 digits'),
+    email: yup
+        .string()
+        .required('Email is required')
+        .email('Email must be a valid email'),
     expiryMonth: yup
         .string()
         .required('Expiry month is required')
@@ -179,6 +200,7 @@ const { handleSubmit, defineField, errors, resetForm } = useForm({
 
 // Define fields using defineField
 const [name, nameProps] = defineField('name')
+const [email, emailProps] = defineField('email')
 const [cardNumber, cardNumberProps] = defineField('cardNumber')
 const [expiryMonth, expiryMonthProps] = defineField('expiryMonth')
 const [expiryYear, expiryYearProps] = defineField('expiryYear')
