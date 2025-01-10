@@ -64,7 +64,7 @@
                 <FormInput
                     v-model="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Enter your email (Recommended)"
                     class="mb-3"
                     v-bind="emailProps"
                     :error-message="errors['email']"

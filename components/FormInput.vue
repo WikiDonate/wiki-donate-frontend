@@ -6,6 +6,7 @@
             :type="type"
             :value="modelValue"
             :class="inputClasses"
+            :placeholder="placeholder"
             @input="$emit('update:modelValue', $event.target.value)"
             @blur="$emit('blur')"
         />
@@ -20,6 +21,10 @@ import { computed, defineProps } from 'vue'
 
 // Define props
 const props = defineProps({
+    placeholder: {
+        type: String,
+        default: '',
+    },
     modelValue: {
         type: [String, Number],
         default: '',
