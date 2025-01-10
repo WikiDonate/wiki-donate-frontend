@@ -66,7 +66,9 @@ const handleSearch = () => {
     if (searchQuery.value) {
         let searchUrl = `/article/new?title=${encodeURIComponent(searchQuery.value)}`
         const foundSuggestion = suggestions.value.find(
-            (suggestion) => suggestion.title === searchQuery.value
+            (suggestion) =>
+                suggestion.title.toLowerCase() ===
+                searchQuery.value.toLowerCase()
         )
 
         if (foundSuggestion) {
