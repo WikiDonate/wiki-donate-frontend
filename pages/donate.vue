@@ -152,6 +152,7 @@
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import FormInput from '~/components/FormInput.vue'
+import { donateService } from '~/services/donateService'
 
 useHead({
     title: 'Donate',
@@ -207,16 +208,33 @@ const [expiryYear, expiryYearProps] = defineField('expiryYear')
 const [cvv, cvvProps] = defineField('cvv')
 const [amount, amountProps] = defineField('amount')
 
-// Submit Payment Function
 const onSubmit = handleSubmit(async (values) => {
-    console.log('Payment Data:', values)
+    showAlert.value = false
 
-    // API Call (example)
-    // await $fetch('/api/save-payment', { method: 'POST', body: form });
+    try {
+        const response = await donateService.saveDonate(values)
+        if (!response.success) {
+            setTimeout(() => {
+                alertVariant.value = 'error'
+                alertMessage.value = response.errors[0]
+                showAlert.value = true
+            }, 0)
+            return
+        }
 
-    alert('Payment details saved successfully!')
-
-    // Optional: Navigate to a success page
-    // router.push('/success');
+        resetForm()
+        setTimeout(() => {
+            alertVariant.value = 'success'
+            alertMessage.value = response.message
+            showAlert.value = true
+        }, 0)
+    } catch (error) {
+        console.error(error)
+        setTimeout(() => {
+            alertVariant.value = 'error'
+            alertMessage.value = error.errors[0]
+            showAlert.value = true
+        }, 0)
+    }
 })
 </script>
