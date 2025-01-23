@@ -1,0 +1,99 @@
+<!-- new article page -->
+<template>
+    <main class="w-full">
+        <TopBarTitle :page-title="'Creating User talk: Mohammed'" />
+        <!-- Top bar -->
+        <TopBar
+            :left-menu-items="[
+                { name: 'Article', link: '/article' },
+                { name: 'Talk', link: '/article/create' },
+            ]"
+            :right-menu-items="[
+                { name: 'Edit Source', link: '/article/edit-source' },
+            ]"
+        />
+
+        <!-- Message -->
+        <AlertMessage
+            v-if="showAlert"
+            :variant="alertVariant"
+            :message="alertMessage"
+            @close="showAlert = false"
+        />
+
+        <!-- create new article -->
+        <section class="bg-white p-2">
+            <p class="bg-white-100 mb-4 text-justify text-sm">
+                No messages have been posted for this user yet. Before creating
+                this page, please see Wikipedia:Subpages. To start a page called
+                User talk:Mohammed/sandbox, type in the box below. When you are
+                done, preview the page to check for errors and then publish it.
+            </p>
+
+            <!-- Editor -->
+            <QuillEditor v-model:content="editorContent" />
+            <p>Editor Content: {{ editorContent }}</p>
+
+            <div class="w-40 mt-4">
+                <FormSubmitButton @click="handleSubmit" />
+            </div>
+        </section>
+    </main>
+</template>
+
+<script setup>
+import { articleService } from '~/services/articleService'
+
+useHead({
+    title: 'Create Article',
+})
+
+const showAlert = ref(false)
+const alertVariant = ref('')
+const alertMessage = ref('')
+const editorContent = ref('')
+
+const handleSubmit = async () => {
+    // Reset alert visibility
+    showAlert.value = false
+
+    try {
+        if (!editorContent.value) {
+            alertVariant.value = 'error'
+            alertMessage.value = 'Please enter some content'
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        // Save article
+        const params = {
+            content: editorContent.value,
+        }
+
+        const response = await articleService.saveArticle(params)
+        if (!response.success) {
+            alertVariant.value = 'error'
+            alertMessage.value = response.errors[0]
+            setTimeout(() => {
+                showAlert.value = true
+            }, 0)
+            return
+        }
+
+        alertVariant.value = 'success'
+        alertMessage.value = response.message
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+    } catch (error) {
+        console.error(error)
+        alertVariant.value = 'error'
+        alertMessage.value = error.errors[0]
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+    }
+}
+</script>

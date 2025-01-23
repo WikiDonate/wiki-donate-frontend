@@ -30,58 +30,64 @@
             />
         </div>
 
-        <!-- article page -->
-        <section class="bg-white p-2">
+        <!-- Content -->
+        <section v-if="editorContent" class="bg-white p-2">
             <div class="flex border-b border-b-gray-300 items-center mb-2">
                 <h2 class="font-bold text-xl mr-2">
-                    {{ articleTitle || title }}
+                    {{ title }}
                 </h2>
             </div>
-            <div v-if="sections.length === 0">
-                <div>
-                    <QuillEditor v-model:content="editorContent" />
-                </div>
-                <div class="w-40 mt-4">
-                    <FormSubmitButton @click="handleSubmit" />
-                </div>
+            <div>
+                <QuillEditor
+                    v-if="editorContent"
+                    v-model:content="editorContent"
+                    :initial-content="editorContent"
+                />
             </div>
-            <div v-else>
-                <div
-                    v-for="(item, index) in sections"
-                    :key="`section-${index}`"
-                >
-                    <div class="flex justify-between">
-                        <div v-html="item.title" />
-                        <NuxtLink
-                            :to="`/article/edit-section?title=${title}&uuid=${index}`"
-                            exact
-                            >[Edit]</NuxtLink
-                        >
-                    </div>
-                    <div v-html="item.content" />
-                    <br />
-                </div>
+            <div class="w-40 mt-4">
+                <FormSubmitButton text="Update" @click="handleSubmit" />
             </div>
         </section>
     </main>
 </template>
 
 <script setup>
-import { articleService } from '~/services/articleService'
+import { onMounted, ref } from 'vue'
+import { talkService } from '~/services/talkService'
 
 useHead({
-    title: 'Article',
+    title: 'Edit Section',
 })
 
 const articleStore = useArticleStore()
+const talkStore = useTalkStore()
 const route = useRoute()
+const router = useRouter()
 const title = route.query.title
+const uuid = route.query.uuid || ''
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
 const editorContent = ref('')
-const articleTitle = ref('')
-const sections = ref({})
+const section = ref({})
+
+const loadSection = async (uuid) => {
+    section.value = JSON.parse(talkStore.talk.sections).find(
+        (item, idx) => idx == uuid
+    )
+
+    if (!section.value) {
+        alertVariant.value = 'error'
+        alertMessage.value = 'Section not found'
+        setTimeout(() => {
+            showAlert.value = true
+        }, 0)
+
+        return
+    }
+
+    editorContent.value = section.value.title + '' + section.value.content
+}
 
 const handleSubmit = async () => {
     showAlert.value = false
@@ -96,13 +102,28 @@ const handleSubmit = async () => {
             return
         }
 
-        // Save article
+        const content = JSON.parse(talkStore.talk.sections)
+        content[uuid] = editorContent.value
+
+        let resultString = ''
+        content.forEach((item) => {
+            if (typeof item === 'string') {
+                resultString += item
+            } else {
+                if (item.title) resultString += item.title
+                if (item.content) resultString += item.content
+            }
+        })
+
+        // Prepare params
         const params = {
-            title: title,
-            content: editorContent.value,
+            uuid: talkStore.talk.uuid,
+            title: talkStore.talk.title,
+            slug: talkStore.talk.slug,
+            content: resultString,
         }
 
-        const response = await articleService.saveArticle(params)
+        const response = await talkService.updateTalk(params)
         if (!response.success) {
             alertVariant.value = 'error'
             alertMessage.value = response.errors[0]
@@ -112,14 +133,10 @@ const handleSubmit = async () => {
             return
         }
 
-        alertVariant.value = 'success'
-        alertMessage.value = response.message
-        setTimeout(() => {
-            showAlert.value = true
-            loadArticle(response.data.slug)
-        }, 0)
+        router.push(
+            `/talk?title=${encodeURIComponent(articleStore.article.slug)}`
+        )
     } catch (error) {
-        console.error(error)
         alertVariant.value = 'error'
         alertMessage.value = error.errors[0]
         setTimeout(() => {
@@ -128,31 +145,7 @@ const handleSubmit = async () => {
     }
 }
 
-const loadArticle = async (slug) => {
-    try {
-        const response = await articleService.getArticle(slug)
-        if (response.success) {
-            articleTitle.value = response.data.title
-            sections.value = JSON.parse(response.data.sections)
-            articleStore.addArticle(response.data)
-        } else {
-            sections.value = []
-            articleStore.clearArticle()
-        }
-    } catch (error) {
-        sections.value = []
-        articleStore.clearArticle()
-        console.error(error)
-    }
-}
-
 onMounted(async () => {
-    await loadArticle(title)
-})
-
-watch(route, (newRoute) => {
-    if (newRoute.query.title) {
-        loadArticle(newRoute.query.title)
-    }
+    await loadSection(uuid)
 })
 </script>

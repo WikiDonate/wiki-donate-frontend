@@ -11,11 +11,11 @@
             :right-menu-items="[
                 {
                     name: 'Edit Source',
-                    link: '/article/edit-source?title=' + title,
+                    link: '/talk/edit-source?title=' + title,
                 },
                 {
                     name: 'View History',
-                    link: '/article/view-history?title=' + title,
+                    link: '/talk/view-history?title=' + title,
                 },
             ]"
         />
@@ -30,11 +30,11 @@
             />
         </div>
 
-        <!-- article page -->
+        <!-- Talk page -->
         <section class="bg-white p-2">
             <div class="flex border-b border-b-gray-300 items-center mb-2">
                 <h2 class="font-bold text-xl mr-2">
-                    {{ articleTitle || title }}
+                    {{ talkTitle || title }}
                 </h2>
             </div>
             <div v-if="sections.length === 0">
@@ -53,7 +53,7 @@
                     <div class="flex justify-between">
                         <div v-html="item.title" />
                         <NuxtLink
-                            :to="`/article/edit-section?title=${title}&uuid=${index}`"
+                            :to="`/talk/edit-section?title=${title}&uuid=${index}`"
                             exact
                             >[Edit]</NuxtLink
                         >
@@ -67,20 +67,21 @@
 </template>
 
 <script setup>
-import { articleService } from '~/services/articleService'
+import { talkService } from '~/services/talkService'
 
 useHead({
-    title: 'Article',
+    title: 'Talk',
 })
 
 const articleStore = useArticleStore()
+const talkStore = useTalkStore()
 const route = useRoute()
 const title = route.query.title
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
 const editorContent = ref('')
-const articleTitle = ref('')
+const talkTitle = ref('')
 const sections = ref({})
 
 const handleSubmit = async () => {
@@ -96,13 +97,13 @@ const handleSubmit = async () => {
             return
         }
 
-        // Save article
         const params = {
+            articleUuid: articleStore.article.uuid,
             title: title,
             content: editorContent.value,
         }
 
-        const response = await articleService.saveArticle(params)
+        const response = await talkService.saveTalk(params)
         if (!response.success) {
             alertVariant.value = 'error'
             alertMessage.value = response.errors[0]
@@ -116,7 +117,7 @@ const handleSubmit = async () => {
         alertMessage.value = response.message
         setTimeout(() => {
             showAlert.value = true
-            loadArticle(response.data.slug)
+            loadTalk(response.data.slug)
         }, 0)
     } catch (error) {
         console.error(error)
@@ -128,31 +129,31 @@ const handleSubmit = async () => {
     }
 }
 
-const loadArticle = async (slug) => {
+const loadTalk = async (title) => {
     try {
-        const response = await articleService.getArticle(slug)
+        const response = await talkService.getTalk(title)
         if (response.success) {
-            articleTitle.value = response.data.title
+            talkTitle.value = response.data.title
             sections.value = JSON.parse(response.data.sections)
-            articleStore.addArticle(response.data)
+            talkStore.addTalk(response.data)
         } else {
             sections.value = []
-            articleStore.clearArticle()
+            talkStore.clearTalk()
         }
     } catch (error) {
         sections.value = []
-        articleStore.clearArticle()
+        talkStore.clearTalk()
         console.error(error)
     }
 }
 
 onMounted(async () => {
-    await loadArticle(title)
+    await loadTalk(title)
 })
 
 watch(route, (newRoute) => {
     if (newRoute.query.title) {
-        loadArticle(newRoute.query.title)
+        loadTalk(newRoute.query.title)
     }
 })
 </script>
