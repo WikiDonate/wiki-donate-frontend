@@ -8,15 +8,16 @@
         <TopBar
             :left-menu-items="[
                 { name: 'Article', link: '/article?title=' + title },
+                { name: 'Talk', link: '/talk?title=' + title },
             ]"
             :right-menu-items="[
                 {
                     name: 'Edit Source',
-                    link: '/article/edit-source?title=' + title,
+                    link: '/talk/edit-source?title=' + title,
                 },
                 {
                     name: 'View History',
-                    link: '/article/view-history?title=' + title,
+                    link: '/talk/view-history?title=' + title,
                 },
             ]"
         />
@@ -52,7 +53,7 @@ import { onMounted, ref } from 'vue'
 const route = useRoute()
 const title = route.query.title || ''
 const uuid = route.query.uuid || ''
-const articleStore = useArticleStore()
+const talkStore = useTalkStore()
 const curHtml = ref('')
 const diffHtml = ref('')
 
@@ -71,7 +72,7 @@ const generateDiffHtml = (diffs) => {
 }
 
 const fetchAndCompare = async (uuid) => {
-    const version = articleStore.history.find((item) => item.uuid == uuid)
+    const version = talkStore.history.find((item) => item.uuid == uuid)
     // Old content prepare
     let oldContent = ''
     JSON.parse(version.oldContent).forEach((item) => {

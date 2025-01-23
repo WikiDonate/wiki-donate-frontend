@@ -28,13 +28,13 @@
             <ul class="list-disc pl-5">
                 <li v-for="history in revisionHistory" :key="history.uuid">
                     (<NuxtLink
-                        :to="`/article/difference-between-revisions?title=${title}&uuid=${history.uuid}`"
+                        :to="`/talk/difference-between-revisions?title=${title}&uuid=${history.uuid}`"
                         class="underline"
                         >cur</NuxtLink
                     >
                     |
                     <NuxtLink
-                        :to="`/article/difference-between-revisions?title=${title}&uuid=${history.uuid}`"
+                        :to="`/talk/difference-between-revisions?title=${title}&uuid=${history.uuid}`"
                         class="underline"
                         >prev</NuxtLink
                     >) - {{ history.createdAt }} update by
@@ -46,30 +46,32 @@
 </template>
 
 <script setup>
-import { articleService } from '~/services/articleService'
+import { talkService } from '~/services/talkService'
 
 useHead({
     title: 'Revision History',
 })
 
-const articleStore = useArticleStore()
+const talkStore = useTalkStore()
 const route = useRoute()
 const title = route.query.title
 const revisionHistory = ref({})
 
 const loadHistory = async (slug) => {
     try {
-        const response = await articleService.getHistory(slug)
+        const response = await talkService.getHistory(slug)
+        console.log(response)
+
         if (response.success) {
             revisionHistory.value = response.data
-            articleStore.addHistory(response.data)
+            talkStore.addHistory(response.data)
         } else {
             revisionHistory.value = []
-            articleStore.clearHistory()
+            talkStore.clearHistory()
         }
     } catch (error) {
         revisionHistory.value = []
-        articleStore.clearHistory()
+        talkStore.clearHistory()
         console.error(error)
     }
 }
