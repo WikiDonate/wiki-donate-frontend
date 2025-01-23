@@ -8,16 +8,16 @@
         <TopBar
             :left-menu-items="[
                 { name: 'Article', link: '/article?title=' + title },
-                // { name: 'Talk', link: '/article/talk' },
+                { name: 'Talk', link: '/talk?title=' + title },
             ]"
             :right-menu-items="[
                 {
                     name: 'Edit Source',
-                    link: '/article/edit-source?title=' + title,
+                    link: '/talk/edit-source?title=' + title,
                 },
                 {
                     name: 'View History',
-                    link: '/article/view-history?title=' + title,
+                    link: '/talk/view-history?title=' + title,
                 },
             ]"
         />
@@ -49,49 +49,50 @@
 </template>
 
 <script setup>
-import { articleService } from '~/services/articleService'
+import { talkService } from '~/services/talkService'
 
 useHead({
     title: 'Edit Source',
 })
 
 const articleStore = useArticleStore()
+const talkStore = useTalkStore()
 const route = useRoute()
 const router = useRouter()
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
 const title = route.query.title
-const articleTitle = ref('')
-const article = ref({})
+const talkTitle = ref('')
+const talk = ref({})
 const editorContent = ref('')
 
-const loadArticle = async (slug) => {
+const loadTalk = async (title) => {
     try {
-        const response = await articleService.getArticle(slug)
+        const response = await talkService.getTalk(title)
         if (response.success) {
-            articleTitle.value = response.data.title
-            article.value = JSON.parse(response.data.sections)
+            talkTitle.value = response.data.title
+            talk.value = JSON.parse(response.data.sections)
 
-            let articleString = ''
-            article.value.forEach((item) => {
+            let talkString = ''
+            talk.value.forEach((item) => {
                 if (typeof item === 'string') {
-                    articleString += item
+                    talkString += item
                 } else {
-                    if (item.title) articleString += item.title
-                    if (item.content) articleString += item.content
+                    if (item.title) talkString += item.title
+                    if (item.content) talkString += item.content
                 }
             })
 
-            editorContent.value = articleString
-            articleStore.addArticle(response.data)
+            editorContent.value = talkString
+            talkStore.addTalk(response.data)
         } else {
             article.value = []
-            articleStore.clearArticle()
+            talkStore.clearArticle()
         }
     } catch (error) {
         sections.value = []
-        articleStore.clearArticle()
+        talkStore.clearArticle()
         console.error(error)
     }
 }
@@ -111,12 +112,13 @@ const handleSubmit = async () => {
 
         // Prepare params
         const params = {
+            uuid: talkStore.talk.uuid,
             title: articleStore.article.title,
             slug: articleStore.article.slug,
             content: editorContent.value,
         }
 
-        const response = await articleService.updateArticle(params)
+        const response = await talkService.updateTalk(params)
         if (!response.success) {
             alertVariant.value = 'error'
             alertMessage.value = response.errors[0]
@@ -127,7 +129,7 @@ const handleSubmit = async () => {
         }
 
         router.push(
-            `/article?title=${encodeURIComponent(articleStore.article.slug)}`
+            `/talk?title=${encodeURIComponent(articleStore.article.slug)}`
         )
     } catch (error) {
         console.error(error)
@@ -140,6 +142,6 @@ const handleSubmit = async () => {
 }
 
 onMounted(async () => {
-    await loadArticle(title)
+    await loadTalk(title)
 })
 </script>

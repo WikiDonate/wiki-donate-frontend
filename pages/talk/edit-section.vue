@@ -11,11 +11,11 @@
             :right-menu-items="[
                 {
                     name: 'Edit Source',
-                    link: '/article/edit-source?title=' + title,
+                    link: '/talk/edit-source?title=' + title,
                 },
                 {
                     name: 'View History',
-                    link: '/article/view-history?title=' + title,
+                    link: '/talk/view-history?title=' + title,
                 },
             ]"
         />

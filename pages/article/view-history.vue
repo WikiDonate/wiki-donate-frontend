@@ -9,7 +9,7 @@
         <TopBar
             :left-menu-items="[
                 { name: 'Article', link: '/article?title=' + title },
-                // { name: 'Talk', link: '/article/talk' },
+                { name: 'Talk', link: '/talk?title=' + title },
             ]"
             :right-menu-items="[
                 {
