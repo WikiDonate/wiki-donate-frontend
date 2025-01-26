@@ -2,9 +2,7 @@
 <template>
     <main class="w-full">
         <!-- Top bar -->
-        <TopBarTitle
-            :page-title="`Editing: ${encodeURIComponent(articleTitle)}`"
-        />
+        <TopBarTitle :page-title="`Editing: ${articleTitle}`" />
         <TopBar
             :left-menu-items="[
                 { name: 'Article', link: '/article?title=' + title },

@@ -46,14 +46,17 @@ const router = useRouter()
 const searchQuery = ref('')
 const suggestions = ref([])
 const searchContainer = ref(null)
+const selectedSuggestions = ref(null)
 
 const fetchSuggestions = async () => {
     if (searchQuery.value.length > 1) {
         try {
+            selectedSuggestions.value = []
             const response = await articleService.searchArticles(
                 searchQuery.value
             )
             suggestions.value = response.data
+            selectedSuggestions.value = response.data
         } catch (error) {
             console.error(error)
         }
@@ -65,7 +68,7 @@ const fetchSuggestions = async () => {
 const handleSearch = () => {
     if (searchQuery.value) {
         let searchUrl = `/article/new?title=${encodeURIComponent(searchQuery.value)}`
-        const foundSuggestion = suggestions.value.find(
+        const foundSuggestion = selectedSuggestions.value.find(
             (suggestion) =>
                 suggestion.title.toLowerCase() ===
                 searchQuery.value.toLowerCase()
@@ -92,7 +95,7 @@ const handleClickOutside = (event) => {
         searchContainer.value &&
         !searchContainer.value.contains(event.target)
     ) {
-        suggestions.value = [] // Clear suggestions when clicking outside
+        suggestions.value = []
     }
 }
 

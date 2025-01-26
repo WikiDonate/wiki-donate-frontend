@@ -3,7 +3,9 @@
 <template>
     <main class="w-full">
         <!-- Top bar Title -->
-        <TopBarTitle :page-title="`${title}: Revision history`" />
+        <TopBarTitle
+            :page-title="`${articleStore.article.title}: Revision history`"
+        />
 
         <!-- Top bar -->
         <TopBar

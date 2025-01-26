@@ -3,7 +3,9 @@
 <template>
     <main class="w-full">
         <!-- Top bar Title -->
-        <TopBarTitle :page-title="`${title}: Revision history`" />
+        <TopBarTitle
+            :page-title="`${articleStore.article.title}: Revision history`"
+        />
 
         <!-- Top bar -->
         <TopBar
@@ -52,6 +54,7 @@ useHead({
     title: 'Revision History',
 })
 
+const articleStore = useArticleStore()
 const talkStore = useTalkStore()
 const route = useRoute()
 const title = route.query.title
@@ -60,8 +63,6 @@ const revisionHistory = ref({})
 const loadHistory = async (slug) => {
     try {
         const response = await talkService.getHistory(slug)
-        console.log(response)
-
         if (response.success) {
             revisionHistory.value = response.data
             talkStore.addHistory(response.data)
