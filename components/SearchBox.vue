@@ -85,8 +85,6 @@ const handleSearch = () => {
 
 const selectSuggestion = (suggestion) => {
     searchQuery.value = suggestion.title
-    console.log(suggestion.slug)
-
     const searchUrl = `/article?title=${encodeURIComponent(suggestion.slug)}`
     suggestions.value = []
     router.push(searchUrl)

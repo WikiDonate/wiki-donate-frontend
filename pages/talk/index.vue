@@ -84,7 +84,7 @@ useHead({
 const articleStore = useArticleStore()
 const talkStore = useTalkStore()
 const route = useRoute()
-const title = decodeURIComponent(route.query.title)
+const title = ref(decodeURIComponent(route.query.title))
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
@@ -156,11 +156,12 @@ const loadTalk = async (title) => {
 }
 
 onMounted(async () => {
-    await loadTalk(title)
+    await loadTalk(title.value)
 })
 
 watch(route, (newRoute) => {
     if (newRoute.query.title) {
+        title.value = decodeURIComponent(newRoute.query.title)
         loadTalk(newRoute.query.title)
     }
 })

@@ -85,7 +85,7 @@ useHead({
 
 const articleStore = useArticleStore()
 const route = useRoute()
-const title = decodeURIComponent(route.query.title)
+const title = ref(decodeURIComponent(route.query.title))
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
@@ -157,12 +157,12 @@ const loadArticle = async (slug) => {
 }
 
 onMounted(async () => {
-    await loadArticle(title)
+    await loadArticle(title.value)
 })
 
 watch(route, (newRoute) => {
-    console.log(newRoute.query.title)
     if (newRoute.query.title) {
+        title.value = decodeURIComponent(newRoute.query.title)
         loadArticle(decodeURIComponent(newRoute.query.title))
     }
 })
