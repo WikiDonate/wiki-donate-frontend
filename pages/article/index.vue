@@ -108,7 +108,7 @@ const handleSubmit = async () => {
 
         // Save article
         const params = {
-            title: title,
+            title: title.value,
             content: editorContent.value,
         }
 

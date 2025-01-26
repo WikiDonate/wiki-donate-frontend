@@ -61,7 +61,7 @@ import DiffMatchPatch from 'diff-match-patch'
 import { onMounted, ref } from 'vue'
 
 const route = useRoute()
-const title = decodeURIComponent(route.query.title) || ''
+const title = decodeURIComponent(route.query.title)
 const uuid = route.query.uuid || ''
 const articleStore = useArticleStore()
 const curHtml = ref('')

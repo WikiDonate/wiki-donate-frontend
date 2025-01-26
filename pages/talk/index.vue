@@ -107,7 +107,7 @@ const handleSubmit = async () => {
 
         const params = {
             articleUuid: articleStore.article.uuid,
-            title: title,
+            title: title.value,
             content: editorContent.value,
         }
 
