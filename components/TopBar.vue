@@ -51,8 +51,7 @@ defineProps({
     },
 })
 
-// const route = useRoute()
 const isActiveRoute = (path, route) => {
-    return route.href === path
+    return route.href === decodeURIComponent(path) || route.path === path
 }
 </script>

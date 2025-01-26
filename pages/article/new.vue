@@ -27,5 +27,5 @@ useHead({
 })
 
 const route = useRoute()
-const title = route.query.title
+const title = decodeURIComponent(route.query.title)
 </script>

@@ -7,17 +7,27 @@
         <!-- Top bar -->
         <TopBar
             :left-menu-items="[
-                { name: 'Article', link: '/article?title=' + title },
-                { name: 'Talk', link: '/talk?title=' + title },
+                {
+                    name: 'Article',
+                    link: '/article?title=' + encodeURIComponent(title),
+                },
+                {
+                    name: 'Talk',
+                    link: '/talk?title=' + encodeURIComponent(title),
+                },
             ]"
             :right-menu-items="[
                 {
                     name: 'Edit Source',
-                    link: '/article/edit-source?title=' + title,
+                    link:
+                        '/article/edit-source?title=' +
+                        encodeURIComponent(title),
                 },
                 {
                     name: 'View History',
-                    link: '/article/view-history?title=' + title,
+                    link:
+                        '/article/view-history?title=' +
+                        encodeURIComponent(title),
                 },
             ]"
         />
@@ -51,7 +61,7 @@ import DiffMatchPatch from 'diff-match-patch'
 import { onMounted, ref } from 'vue'
 
 const route = useRoute()
-const title = route.query.title || ''
+const title = decodeURIComponent(route.query.title) || ''
 const uuid = route.query.uuid || ''
 const articleStore = useArticleStore()
 const curHtml = ref('')

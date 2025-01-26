@@ -5,17 +5,25 @@
         <TopBarTitle :page-title="`Editing: ${articleStore.article.title}`" />
         <TopBar
             :left-menu-items="[
-                { name: 'Article', link: '/article?title=' + title },
-                { name: 'Talk', link: '/talk?title=' + title },
+                {
+                    name: 'Article',
+                    link: '/article?title=' + encodeURIComponent(title),
+                },
+                {
+                    name: 'Talk',
+                    link: '/talk?title=' + encodeURIComponent(title),
+                },
             ]"
             :right-menu-items="[
                 {
                     name: 'Edit Source',
-                    link: '/talk/edit-source?title=' + title,
+                    link:
+                        '/talk/edit-source?title=' + encodeURIComponent(title),
                 },
                 {
                     name: 'View History',
-                    link: '/talk/view-history?title=' + title,
+                    link:
+                        '/talk/view-history?title=' + encodeURIComponent(title),
                 },
             ]"
         />
@@ -60,7 +68,7 @@ const router = useRouter()
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
-const title = route.query.title
+const title = decodeURIComponent(route.query.title)
 const talkTitle = ref('')
 const talk = ref({})
 const editorContent = ref('')
