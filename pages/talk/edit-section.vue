@@ -3,6 +3,7 @@
 <template>
     <main class="w-full">
         <!-- Top bar -->
+        <TopBarTitle :page-title="`${title} : Section`" />
         <TopBar
             :left-menu-items="[
                 {
@@ -40,11 +41,6 @@
 
         <!-- Content -->
         <section v-if="editorContent" class="bg-white p-2">
-            <div class="flex border-b border-b-gray-300 items-center mb-2">
-                <h2 class="font-bold text-xl mr-2">
-                    {{ title }}
-                </h2>
-            </div>
             <div>
                 <QuillEditor
                     v-if="editorContent"
