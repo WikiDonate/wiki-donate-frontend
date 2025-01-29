@@ -3,6 +3,7 @@
 <template>
     <main class="w-full">
         <!-- Top bar -->
+        <TopBarTitle :page-title="`${articleTitle || title}`" />
         <TopBar
             :left-menu-items="[
                 {
@@ -46,11 +47,6 @@
 
         <!-- article page -->
         <section class="bg-white p-2">
-            <div class="flex border-b border-b-gray-300 items-center mb-2">
-                <h2 class="font-bold text-xl mr-2">
-                    {{ articleTitle || title }}
-                </h2>
-            </div>
             <div v-if="sections.length === 0">
                 <div>
                     <QuillEditor v-model:content="editorContent" />

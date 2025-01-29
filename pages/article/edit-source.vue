@@ -2,7 +2,7 @@
 <template>
     <main class="w-full">
         <!-- Top bar -->
-        <TopBarTitle :page-title="`Editing: ${articleTitle}`" />
+        <TopBarTitle :page-title="`${articleTitle} : Editing`" />
         <TopBar
             :left-menu-items="[
                 {

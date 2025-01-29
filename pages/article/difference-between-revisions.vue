@@ -2,7 +2,7 @@
 <template>
     <main class="w-full">
         <!-- Top bar Title -->
-        <TopBarTitle :page-title="`${title}: Difference between revisions`" />
+        <TopBarTitle :page-title="`${title} : Difference between revisions`" />
 
         <!-- Top bar -->
         <TopBar
