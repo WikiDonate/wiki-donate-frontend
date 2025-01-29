@@ -9,7 +9,7 @@
         "name": "Donate",
         "link": "/donate",
         "type": "",
-        "onLogin": ""
+        "onLogin": "show"
     },
     {
         "name": "Create Account",

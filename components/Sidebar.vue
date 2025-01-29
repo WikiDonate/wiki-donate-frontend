@@ -23,16 +23,28 @@
 import { onMounted, ref } from 'vue'
 import menuData from '~/static/menu.json'
 
-// Define reactive variables
-const menu = ref([])
+const authStore = useAuthStore()
+const route = useRoute()
 const mainMenu = ref([])
 
-onMounted(() => {
-    menu.value = menuData
-    mainMenu.value = menu.value.filter(
-        (item) => item.type === 'MainMenu' || item.type === ''
-    )
-})
+const handleMenu = () => {
+    mainMenu.value = menuData.filter((item) => {
+        if (authStore.isAuthenticated) {
+            return (
+                (item.type === 'MainMenu' || item.type === '') &&
+                item.onLogin !== 'hide'
+            )
+        } else {
+            return (
+                item.type === 'MainMenu' ||
+                (item.type === '' && item.onLogin !== 'show')
+            )
+        }
+    })
+}
+
+onMounted(() => handleMenu())
+watch(route, () => handleMenu())
 
 // Function to check if the current route is active
 const isActiveRoute = (path, route) => route.path === path
