@@ -22,7 +22,7 @@
         <!-- Right items -->
         <div class="space-x-4 text-sm flex basis-6/12 justify-end pr-4">
             <NuxtLink
-                v-for="(item, index) in rightMenuItems"
+                v-for="(item, index) in rightMenu"
                 :key="index"
                 :to="item.link"
                 exact
@@ -39,8 +39,9 @@
 </template>
 
 <script setup>
-// Props for dynamic menu items
-defineProps({
+const authStore = useAuthStore()
+const route = useRoute()
+const { rightMenuItems, leftMenuItems } = defineProps({
     leftMenuItems: {
         type: Array,
         default: () => [],
@@ -50,6 +51,20 @@ defineProps({
         default: () => [],
     },
 })
+const rightMenu = ref([])
+
+onMounted(() => handleRightMenuItems())
+watch(route, () => handleRightMenuItems())
+
+const handleRightMenuItems = () => {
+    rightMenu.value = rightMenuItems.filter((item) => {
+        if (authStore.isAuthenticated) {
+            return item.isAuthenticated || !item.isAuthenticated
+        } else {
+            return !item.isAuthenticated
+        }
+    })
+}
 
 const isActiveRoute = (path, route) => {
     return route.href === decodeURIComponent(path) || route.path === path

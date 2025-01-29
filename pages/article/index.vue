@@ -8,10 +8,12 @@
                 {
                     name: 'Article',
                     link: '/article?title=' + encodeURIComponent(title),
+                    isAuthenticated: false,
                 },
                 {
                     name: 'Talk',
                     link: '/talk?title=' + encodeURIComponent(title),
+                    isAuthenticated: false,
                 },
             ]"
             :right-menu-items="[
@@ -20,12 +22,14 @@
                     link:
                         '/article/edit-source?title=' +
                         encodeURIComponent(title),
+                    isAuthenticated: true,
                 },
                 {
                     name: 'View History',
                     link:
                         '/article/view-history?title=' +
                         encodeURIComponent(title),
+                    isAuthenticated: false,
                 },
             ]"
         />
@@ -63,6 +67,7 @@
                     <div class="flex justify-between">
                         <div v-html="item.title" />
                         <NuxtLink
+                            v-if="authStore.isAuthenticated"
                             :to="`/article/edit-section?title=${title}&uuid=${index}`"
                             exact
                             >[Edit]</NuxtLink
@@ -84,6 +89,7 @@ useHead({
 })
 
 const articleStore = useArticleStore()
+const authStore = useAuthStore()
 const route = useRoute()
 const title = ref(decodeURIComponent(route.query.title))
 const showAlert = ref(false)

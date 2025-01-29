@@ -27,6 +27,9 @@ const authStore = useAuthStore()
 const route = useRoute()
 const mainMenu = ref([])
 
+onMounted(() => handleMenu())
+watch(route, () => handleMenu())
+
 const handleMenu = () => {
     mainMenu.value = menuData.filter((item) => {
         if (authStore.isAuthenticated) {
@@ -42,9 +45,6 @@ const handleMenu = () => {
         }
     })
 }
-
-onMounted(() => handleMenu())
-watch(route, () => handleMenu())
 
 // Function to check if the current route is active
 const isActiveRoute = (path, route) => route.path === path
