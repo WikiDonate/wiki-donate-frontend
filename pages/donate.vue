@@ -5,7 +5,7 @@
                 <h1
                     class="text-2xl lg:text-4xl font-bold text-gray-800 mb-6 text-center"
                 >
-                    Make Donate
+                    Make A Donation
                 </h1>
                 <!-- Message -->
                 <AlertMessage
