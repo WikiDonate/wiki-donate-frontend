@@ -202,6 +202,9 @@ const validationSchema = yup.object({
 // Setup VeeValidate
 const { handleSubmit, defineField, errors, resetForm } = useForm({
     validationSchema,
+    initialValues: {
+        email: authStore.user.email ?? '',
+    },
 })
 
 // Define fields using defineField
@@ -212,10 +215,6 @@ const [expiryMonth, expiryMonthProps] = defineField('expiryMonth')
 const [expiryYear, expiryYearProps] = defineField('expiryYear')
 const [cvv, cvvProps] = defineField('cvv')
 const [amount, amountProps] = defineField('amount')
-
-onMounted(() => {
-    emailProps.value.modelValue = authStore.user.email ?? ''
-})
 
 const onSubmit = handleSubmit(async (values) => {
     showAlert.value = false
