@@ -158,6 +158,11 @@ useHead({
     title: 'Donate',
 })
 
+definePageMeta({
+    middleware: 'auth',
+})
+
+const authStore = useAuthStore()
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
@@ -207,6 +212,10 @@ const [expiryMonth, expiryMonthProps] = defineField('expiryMonth')
 const [expiryYear, expiryYearProps] = defineField('expiryYear')
 const [cvv, cvvProps] = defineField('cvv')
 const [amount, amountProps] = defineField('amount')
+
+onMounted(() => {
+    emailProps.value.modelValue = authStore.user.email ?? ''
+})
 
 const onSubmit = handleSubmit(async (values) => {
     showAlert.value = false
