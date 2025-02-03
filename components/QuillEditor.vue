@@ -156,12 +156,16 @@ function setupAlignmentButtons() {
     }
 }
 
+function convertToH2(htmlString) {
+    return htmlString.replace(/<p>==(.+?)==<\/p>/g, '<h2><u>$1</u></h2>')
+}
+
 // Emit updated content on input
 function handleInput() {
     const quill = quillEditor.value?.getQuill()
     if (quill) {
         const currentContent = quill.root.innerHTML // Get the editor content as HTML
-        emit('update:content', currentContent)
+        emit('update:content', convertToH2(currentContent))
     }
 }
 
