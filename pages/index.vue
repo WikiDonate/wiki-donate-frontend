@@ -37,7 +37,7 @@
             </p>
             <div class="text-center">
                 <a
-                    href="#"
+                    href="https://wikidonate.org/article?title=wikidonatehow-to-use-wikidonate"
                     class="text-lg text-blue-500 font-semibold hover:text-blue-700"
                     >Check out how to use WikiDonate here.</a
                 >

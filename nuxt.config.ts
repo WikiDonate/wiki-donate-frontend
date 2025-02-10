@@ -26,6 +26,8 @@ export default defineNuxtConfig({
             apiUrl:
                 process.env.NUXT_PUBLIC_API_URL ||
                 'http://localhost:8000/api/v1',
+
+            recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY,
         },
     },
 })
