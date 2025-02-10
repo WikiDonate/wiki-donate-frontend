@@ -150,17 +150,24 @@ const onSubmit = handleSubmit(async (values) => {
 
     try {
         if (!reCaptchaToken.value) {
-            alertVariant.value = 'error'
-            alertMessage.value = 'Please verify you are not a robot'
-            showAlert.value = true
+            setTimeout(() => {
+                alertVariant.value = 'error'
+                alertMessage.value = 'Please verify you are not a robot'
+                showAlert.value = true
+            }, 0)
             return
         }
 
-        const response = await userService.register(values)
+        const response = await userService.register({
+            ...values,
+            token: reCaptchaToken.value,
+        })
         if (!response.success) {
-            alertVariant.value = 'error'
-            alertMessage.value = response.errors[0]
-            showAlert.value = true
+            setTimeout(() => {
+                alertVariant.value = 'error'
+                alertMessage.value = response.errors[0]
+                showAlert.value = true
+            }, 0)
             return
         }
 
@@ -169,10 +176,12 @@ const onSubmit = handleSubmit(async (values) => {
         alertMessage.value = response.message
         showAlert.value = true
     } catch (error) {
-        console.log(error)
-        alertVariant.value = 'error'
-        alertMessage.value = error.errors[0]
-        showAlert.value = true
+        setTimeout(() => {
+            console.log(error)
+            alertVariant.value = 'error'
+            alertMessage.value = error.errors[0]
+            showAlert.value = true
+        }, 0)
     }
 })
 </script>
