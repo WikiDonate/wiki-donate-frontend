@@ -69,8 +69,17 @@
                     v-bind="emailProps"
                     :error-message="errors['email']"
                 />
+
+                <div>
+                    <RecaptchaV2
+                        @error-callback="handleErrorCallback"
+                        @expired-callback="handleExpiredCallback"
+                        @load-callback="handleLoadCallback"
+                    />
+                </div>
+
                 <!-- Submit Button -->
-                <div class="flex justify-center">
+                <div class="flex justify-center mt-3">
                     <FormSubmitButton
                         text="Create Account"
                         type="submit"
@@ -85,6 +94,7 @@
 
 <script setup>
 import { useForm } from 'vee-validate'
+import { RecaptchaV2 } from 'vue3-recaptcha-v2'
 import * as yup from 'yup'
 import { userService } from '~/services/userService'
 
@@ -95,6 +105,17 @@ useHead({
 const showAlert = ref(false)
 const alertVariant = ref('')
 const alertMessage = ref('')
+const reCaptchaToken = ref('')
+
+const handleErrorCallback = () => {
+    reCaptchaToken.value = null
+}
+const handleExpiredCallback = () => {
+    reCaptchaToken.value = null
+}
+const handleLoadCallback = (response) => {
+    reCaptchaToken.value = response
+}
 
 const validationSchema = yup.object({
     username: yup
@@ -128,6 +149,13 @@ const onSubmit = handleSubmit(async (values) => {
     showAlert.value = false
 
     try {
+        if (!reCaptchaToken.value) {
+            alertVariant.value = 'error'
+            alertMessage.value = 'Please verify you are not a robot'
+            showAlert.value = true
+            return
+        }
+
         const response = await userService.register(values)
         if (!response.success) {
             alertVariant.value = 'error'

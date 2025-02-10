@@ -47,6 +47,7 @@
         "vue-quill-editor": "^3.0.6",
         "vue-recaptcha-v3": "^2.0.1",
         "vue-router": "latest",
+        "vue3-recaptcha-v2": "^2.1.0",
         "yap": "^0.0.2",
         "yup": "^1.4.0"
     },
